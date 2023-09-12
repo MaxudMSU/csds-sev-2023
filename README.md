@@ -1,2 +1,5 @@
-# csds-sev-2023
-Solutions of tasks proposed by proffesor George Osipenko in 2023
+# Solutions of ODE tasks
+
+## About
+
+There are some tasks proposed by proffesor of Sevastopol branch of MSU George Osipenko within the course "Computer simulation of dynamical systems".
