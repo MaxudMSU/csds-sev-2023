@@ -1,4 +1,4 @@
-# Solutions of ODE tasks
+# Solutions of CSDS tasks
 
 ## About
 
