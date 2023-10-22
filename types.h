@@ -21,8 +21,9 @@ public:
     // void set_area(double h);
 };
 
-double duff_eq(double t, double x, double y, double omega, double delta, double g){
-    return x-pow(x,3)-delta*y+g*cos(omega*t);
+//уравнение Дуффинга
+double duff_eq(double t, double x, double y, double alpha, double beta, double omega, double k, double b){
+    return -alpha*x - beta*pow(x,3)- k*y + b*cos(omega*t);
 }
 
 class Point{
@@ -33,7 +34,9 @@ public:
     Point(float xx,float yy){x=xx; y=yy;}
     double getx() {return x;}
     double gety() {return y;}
+    
     //метод для определения номера ячейки, в которой находится точка
+    //область задаётся типом Area
     int cell(Area& a, int n, double h){
         if(x<a.x_left || x>a.x_right || y>a.y_top || y<a.y_down) return 0;
         int nomer = floor((fabs(a.y_top-y))/h)*n + (ceil ((fabs(a.x_left-x))/h));
@@ -41,7 +44,9 @@ public:
         if (y==a.y_down) nomer-=n;
         return nomer;
     }
-
+    
+    //метод для определения номера ячейки, в которой находится точка
+    //область задаётся координатами углов
     int cell2(double x_left, double y_top, double x_right, double y_down, int n, double h){
         if(x<x_left || x>x_right || y>y_top || y<y_down) return 0;
         int nomer = floor((fabs(y_top-y))/h)*n + (ceil ((fabs(x_left-x))/h));
@@ -49,6 +54,9 @@ public:
         if (y==y_down) nomer-=n;
         return nomer;
     }
+    
+    //отображение Жюлиа
+    //изменяется исходная точка
     Point& julia(double a,double b){
         double xj=pow(x,2)-pow(y,2)+a;
         double yj=2*x*y+b;
@@ -56,11 +64,15 @@ public:
         y=yj;
         return *this;
     }
+    //отображение Жюлиа
+    //строится новая точка
     Point julia1(double a, double b){
         double xj=pow(x,2)-pow(y,2)+a;
         double yj=2*x*y+b;
         return Point(xj,yj); 
     }
+    //отображение Хенона
+    //изменяется исходная точка
     Point& henon(double a,double b){
         double xh=1+y-a*pow(x,2);
         double yh=b*x;
@@ -68,6 +80,8 @@ public:
         y=yh;
         return *this;
     }
+    //отображение Хенона
+    //строится новая точка
     Point henon1(double a, double b){
         double xh=1+y-a*pow(x,2);
         double yh=b*x;
@@ -85,28 +99,50 @@ public:
         return Point(xhmr, yhmr);
     }
     
-    
-
-    Point duffing(double omega, double delta, double g){
+    //отображение, созданное из уравнения Дуффинга
+    //методом Рунге-Кутта
+    Point duffing_rk(double alpha, double beta, double k, double b, double omega){
         double period = (2*M_PI)/omega;
-        double h = 0.01;
-        int n = period/h;
+        double shag = 0.2;
         double k1,k2,k3,k4,m1,m2,m3,m4, xrez, yrez;
-        for (int i=0; i<=n; i++){
+        double t = 0;
+        double x1 = x;
+        double y1 = y;
+        while (t <= period){
             k1 = y;
-            m1 = duff_eq(period, x, y, omega, delta, g);
-            k2 = y + (h*m1)/2;
-            m2 = duff_eq(period + h/2, x + (h*k1)/2, y + (h*m1)/2, omega, delta, g);
-            k3 = y + (h*m2)/2;
-            m3 = duff_eq(period + h/2, x + (h*k2)/2, y + (h*m2)/2, omega, delta, g);
-            k4 = y + h*m3;
-            m4 = duff_eq(period + h, x + h*k3, y + h*m3, omega, delta, g);
-            x = x + (h/6)*(k1+2*k2+2*k3+k4);
-            y = y +(h/6)*(m1+2*m2+2*m3+m4);
+            m1 = duff_eq(t, x1, y1, alpha, beta, omega, k, b);
+            k2 = y + (shag*m1)/2;
+            m2 = duff_eq(t + shag/2, x + (shag*k1)/2, y + (shag*m1)/2, alpha, beta, omega, k, b);
+            k3 = y + (shag*m2)/2;
+            m3 = duff_eq(t + shag/2, x + (shag*k2)/2, y + (shag*m2)/2, alpha, beta, omega, k, b);
+            k4 = y + shag*m3;
+            m4 = duff_eq(t + shag, x + shag*k3, y + shag*m3, alpha, beta, omega, k, b);
+            t = t + shag;
+            x = x + (shag/6)*(k1+2*k2+2*k3+k4);
+            y = y +(shag/6)*(m1+2*m2+2*m3+m4);
         }
         
-        return Point(x, y);
+        return Point(x1, y1);
     }
+    
+    //отображение, созданное из уравнения Дуффинга
+    //методом Эйлера
+    Point duffing_e(double alpha, double beta, double k, double b, double omega){
+        double period = (2*M_PI)/omega;
+        double shag = 0.2;
+        double t = 0;
+        double x1 = x;
+        double y1 = y;
+
+        while (t <= period){
+            y1 = y1 + shag*duff_eq(t, x1, y1, alpha, beta, omega, k, b);
+            x1 = x1 + shag*y1;
+            t = t + shag;
+        }
+        
+        return Point(x1, y1);
+    }
+    
 
     bool isClose(Point p, double r){
         return ((pow(p.x-x,2)+(pow(p.y-y,2))) <= pow(r,2));
@@ -116,13 +152,8 @@ public:
         cout << x << ", " << y << endl;;
     }
 
-    // void fprint(std::ofstream fout){
-    //     fout << x << ", " << y << std::endl;
-    // }
-
     void draw(int color);
 };
-
 
 
 double distance(Point a, Point b){
@@ -159,23 +190,15 @@ vector<Point> pointsFromFile(char* filename){
     return numberPoints;
 }
 
-vector<int> vozvratFromFile(char* filename){
+vector<int> vozvratFromFile(char* filename, int n=1){
     ifstream inputFile(filename);
     vector<int> vozvrat_cells;
-    double num;
+    double  num;
     int counter = 1;
-    // bool isFirst = 1;
     while (inputFile >> num){
-        // if (isFirst) {
-        //     continue;
-        //     isFirst = 0;
-        // }
-        // cout << num << endl;
-        if (counter == 3){
+        if (counter == n){
             int cel = (int)num;
-            // cout << num << endl;
             vozvrat_cells.push_back(cel);
-            // cout << "third" << endl;
             counter = 1;
         }
         else counter++;
@@ -183,10 +206,6 @@ vector<int> vozvratFromFile(char* filename){
     inputFile.close();
     return vozvrat_cells;
 }
-
-// Point cell_coord(Area& a, double h, int cellnum){
-//     int cell_x = cellnum / 
-// }
 
 pair<double,double> Area::cell_coord(int num, double h){
     int otstup_x, otstup_y;
