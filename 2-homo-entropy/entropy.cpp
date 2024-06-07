@@ -44,7 +44,7 @@ int main(int argc, char** argv){
     }
     
     else{
-        gv1 = pointsFromFile("file");
+        gv1 = pointsFromFile("file.osip");
         vector<Point> newgv1 = gen(gv1[0], gv1[1], acc);
         for(int ii=2; ii < gv1.size(); ii++){
             vector<Point> temp1 = gen(gv1[ii], gv1[ii+1], acc);
@@ -56,8 +56,8 @@ int main(int argc, char** argv){
     double N1 = gv1.size();
     double entropy = log(N1)/itercount;
     ofstream file, res;
-    file.open("file", ios::trunc);
-    res.open("res", ios::trunc);
+    file.open("file.osip", ios::trunc);
+    res.open("res.osip", ios::trunc);
     res << entropy;
     
     // запись в файл

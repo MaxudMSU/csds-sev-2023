@@ -174,7 +174,7 @@ int main(int argc, char** argv){
     }
     else{
         vector<int> vozvrat_set;
-        vector<int> new_vozvr = vozvratFromFile((char*)"file", 3);
+        vector<int> new_vozvr = vozvratFromFile((char*)"file.osip", 3);
         for (int elem : new_vozvr){
             vector<int> temp = cell_dribling(elem, n_x);
             vozvrat_set.insert(vozvrat_set.end(), temp.begin(), temp.end());

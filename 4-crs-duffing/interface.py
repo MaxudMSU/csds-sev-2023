@@ -23,7 +23,7 @@ def true_start():
     par_list = ' '.join(list(map(lambda x: x.get(), entery_list[2:])))
     iter_num = 0
     times = 0
-    os.system('g++ chain-recursion-set.cpp')
+    os.system('g++ crs-duffing.cpp')
     proga_work()
 
 def proga_work():
@@ -34,12 +34,10 @@ def proga_work():
     global iter_num
     start = time.time()
     current_par_list = par_list + ' ' + str(h) + ' ' + str(isStart)
-    os.system('./a.out ' + current_par_list + ' > file1')
-    os.system('cat file1 > file')
+    os.system('./a.out ' + current_par_list)
     timee = time.time() - start
     times += timee
     iter_num += 1
-
     res5_value.config(text=str(iter_num))
     res3_value.config(text=str(timee))
     res4_value.config(text=str(times))
@@ -54,14 +52,15 @@ def iter():
 
 def draw_result():
     global h
-    with open('file') as file:
-        raw = file.read()
-        splt = raw.split()
+    file = open('points_file.osip', 'r')
+    raw = file.read()
+    file.close()
+    splt = raw.split()
     splt1 = list(map(eval, splt))
-    res1_value.config(text=str(len(splt1)/3))
+    res1_value.config(text=str(len(splt1)/2))
     ax.clear()
-    for i in range(0, len(splt1),3):
-        rectangle = plt.Rectangle((splt1[i], splt1[i+1]), h, h, fc='black',ec="black")
+    for i in range(1, len(splt1),2):
+        rectangle = plt.Rectangle((splt1[i-1], splt1[i]), h, h, fc='black',ec="black")
         ax.add_patch(rectangle)
     ax.set_xlim([-2, 2])
     ax.set_ylim([-2, 2])
@@ -70,14 +69,17 @@ def draw_result():
 
 def fill_map():
     clear_all()
-    x_entry.insert(0, 'x**2 - y**2 + a')
-    y_entry.insert(0, '2*x*y+b')
-    para_entry.insert(0, '0.2')
-    parb_entry.insert(0, '-0.2')
-    x1_entry.insert(0,'-1.5')
-    y1_entry.insert(0, '-1.5')
-    x2_entry.insert(0, '1.5')
-    y2_entry.insert(0, '1.5')
+    x_entry.insert(0, 'y')
+    y_entry.insert(0, '-a*x-b*x**3-k*y+B*cos(omega*t)')
+    paralpha_entry.insert(0, '-0.8')
+    parbeta_entry.insert(0, '1')
+    park_entry.insert(0, '0.25')
+    parb_entry.insert(0, '0.3')
+    paromega_entry.insert(0, '1')
+    x1_entry.insert(0,'-2')
+    y1_entry.insert(0, '-2')
+    x2_entry.insert(0, '2')
+    y2_entry.insert(0, '2')
     h_entry.insert(0, '0.5')
 
 def clear_all():
@@ -105,46 +107,74 @@ frame1 = Frame(notebook, padx=10, pady=10)
 frame1.pack(expand=True, fill=BOTH)
 notebook.add(frame1, text="Ввод данных")
 
-map_label = Label(frame1, text="Отображение и область")
-map_label.pack(fill=BOTH)
-
-frame11 = Frame(frame1, borderwidth=1, relief=SOLID)
+frame11 = Frame(frame1)
 frame11.pack(expand=True, fill=BOTH)
 
-frame111 = Frame(frame11)
+frame111 = LabelFrame(frame11, borderwidth=1, relief=SOLID, text='Отображение')
 frame111.pack(side=LEFT, expand=True, fill=BOTH, padx=10, pady=10)
 
-x_label = Label(frame111, text='f(x)= ', anchor='e')
+frame111_left = Frame(frame111)
+frame111_left.pack(side=LEFT, expand=True, fill=BOTH, padx=10, pady=10)
+
+x_label = Label(frame111_left, text='dx/dt = ', anchor='e')
 x_label.pack(expand=True, fill=BOTH)
 
-y_label = Label(frame111, text='y(x)= ', anchor='e')
+y_label = Label(frame111_left, text='dy/dt = ', anchor='e')
 y_label.pack(expand=True, fill=BOTH)
 
-para_label = Label(frame111, text='a= ', anchor='e')
-para_label.pack(expand=True, fill=BOTH)
+frame111_right = Frame(frame111)
+frame111_right.pack(side=LEFT, expand=True, fill=BOTH, padx=10, pady=10)
 
-parb_label = Label(frame111, text='b= ', anchor='e')
-parb_label.pack(expand=True, fill=BOTH)
-
-h_label = Label(frame111, text='Начальный размер ячейки: ', anchor='e')
-h_label.pack(expand=True, fill=BOTH)
-
-frame112 = Frame(frame11)
-frame112.pack(side=LEFT, expand=True, fill=BOTH, padx=10, pady=10)
-
-x_entry = Entry(frame112)
+x_entry = Entry(frame111_right)
 x_entry.pack(expand=True, fill=X)
 
-y_entry = Entry(frame112)
+y_entry = Entry(frame111_right, width=35)
 y_entry.pack(expand=True, fill=X)
 
-para_entry = Entry(frame112)
-para_entry.pack(expand=True, fill=X)
 
-parb_entry = Entry(frame112)
+frame112 = LabelFrame(frame11, borderwidth=1, relief=SOLID, text='Параметры')
+frame112.pack(side=LEFT, expand=True, fill=BOTH, padx=10, pady=10)
+
+frame112_left = Frame(frame112)
+frame112_left.pack(side=LEFT, expand=True, fill=BOTH)
+
+paralpha_label = Label(frame112_left, text='alpha = ', anchor='e')
+paralpha_label.pack(expand=True, fill=BOTH)
+
+parbeta_label = Label(frame112_left, text='beta = ', anchor='e')
+parbeta_label.pack(expand=True, fill=BOTH)
+
+park_label = Label(frame112_left, text='k = ', anchor='e')
+park_label.pack(expand=True, fill=BOTH)
+
+parb_label = Label(frame112_left, text='B = ', anchor='e')
+parb_label.pack(expand=True, fill=BOTH)
+
+paromega_label = Label(frame112_left, text='omega = ', anchor='e')
+paromega_label.pack(expand=True, fill=BOTH)
+
+h_label = Label(frame112_left, text='Начальный размер ячейки: ', anchor='e')
+h_label.pack(expand=True, fill=BOTH)
+
+frame112_right = Frame(frame112)
+frame112_right.pack(side=LEFT, expand=True, fill=BOTH)
+
+paralpha_entry = Entry(frame112_right)
+paralpha_entry.pack(expand=True, fill=X)
+
+parbeta_entry = Entry(frame112_right)
+parbeta_entry.pack(expand=True, fill=X)
+
+park_entry = Entry(frame112_right)
+park_entry.pack(expand=True, fill=X)
+
+parb_entry = Entry(frame112_right)
 parb_entry.pack(expand=True, fill=X)
 
-h_entry = Entry(frame112)
+paromega_entry = Entry(frame112_right)
+paromega_entry.pack(expand=True, fill=X)
+
+h_entry = Entry(frame112_right)
 h_entry.pack(expand=True, fill=X)
 
 points_label = Label(frame1, text="Координаты начальной области")
@@ -153,7 +183,7 @@ points_label.pack(fill=BOTH)
 frame12 = Frame(frame1)
 frame12.pack(expand=True, fill=BOTH)
 
-frame121 = Frame(frame12, borderwidth=1, relief=SOLID)
+frame121 = LabelFrame(frame12, borderwidth=1, relief=SOLID, text='Левый нижний угол')
 frame121.pack(side=LEFT, expand=True, fill=BOTH, padx=10)
 
 frame1211 = Frame(frame121)
@@ -174,7 +204,7 @@ x1_entry.pack(expand=True, fill=X)
 y1_entry = Entry(frame1212)
 y1_entry.pack(expand=True, fill=X)
 
-frame122 = Frame(frame12, borderwidth=1, relief=SOLID)
+frame122 = LabelFrame(frame12, borderwidth=1, relief=SOLID, text='Правый верхний угол')
 frame122.pack(side=LEFT, expand=True, fill=BOTH, padx=10)
 
 frame1221 = Frame(frame122)
@@ -245,7 +275,6 @@ res4_value.pack(expand=True, fill=BOTH)
 res6_value = Label(frame212, text='', anchor='w', font=("Arial", 14))
 res6_value.pack(expand=True, fill=BOTH)
 
-
 iter_frame = Frame(frame2)
 iter_frame.pack(expand=True, fill=BOTH)
 
@@ -274,7 +303,7 @@ toolbar.update()
 canvas.get_tk_widget().pack(expand=True, fill=BOTH)
 toolbar.pack(expand=True, fill=X)
 
-entery_list = [x_entry,y_entry,x1_entry, y1_entry, x2_entry, y2_entry, para_entry, parb_entry]
+entery_list = [x_entry,y_entry,x1_entry, y1_entry, x2_entry, y2_entry, paralpha_entry, parbeta_entry, park_entry, parb_entry, paromega_entry]
 res_entries = [res1_value, res5_value, res3_value, res4_value, res6_value]
 
 fill_map()

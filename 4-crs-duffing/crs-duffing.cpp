@@ -97,13 +97,13 @@ vector<int> cell_dribling(int item, int leng){
     return vector<int>{new1,new2,new3,new4}; 
 }
 
-vector<int> theLoop(Area& area, double h, double para, double parb, vector<int> vozvrat_set){
+vector<int> theLoop(Area& area, float h, float para, float parb, vector<int> vozvrat_set){
     int cou = 1;
-    double xdown=area.x_left, xup=area.x_right, ydown=area.y_down, yup=area.y_top;
-    double xtmp = xdown;
-    double ytmp = yup;
-    double xckl = xdown;
-    double yckl = yup;
+    float xdown=area.x_left, xup=area.x_right, ydown=area.y_down, yup=area.y_top;
+    float xtmp = xdown;
+    float ytmp = yup;
+    float xckl = xdown;
+    float yckl = yup;
     int pt = 8;
     int n_x=area.get_hx(h);
     int n_y=area.get_hy(h);
@@ -120,10 +120,10 @@ vector<int> theLoop(Area& area, double h, double para, double parb, vector<int> 
                     // Point rz = tmp.duffing_e(-0.8, 1, 0.25, 0.3, 1);
                     Point rz = tmp.duffing_e(-1, 1, 0.25, 0.3, 1);
                     int cell = rz.cell(area, n_x, h);
-                    xtmp = tmp.x;
-                    ytmp = tmp.y;
-                    double xrz = rz.x;
-                    double yrz = rz.y;
+                    // xtmp = tmp.x;
+                    // ytmp = tmp.y;
+                    float xrz = rz.x;
+                    float yrz = rz.y;
                     
                     
                     if (!cell) continue;
@@ -163,16 +163,16 @@ vector<int> theLoop(Area& area, double h, double para, double parb, vector<int> 
 }
 
 int main(int argc, char** argv){
-    double x_left = atof(argv[1]);
-    double y_down = atof(argv[2]);
-    double x_right = atof(argv[3]);
-    double y_top = atof(argv[4]);
-    double par_alpha = atof(argv[5]);
-    double par_beta = atof(argv[6]);
-    double par_k = atof(argv[7]);
-    double par_b = atof(argv[8]);
-    double par_omega = atof(argv[9]);
-    double hh = atof(argv[10]);
+    float x_left = atof(argv[1]);
+    float y_down = atof(argv[2]);
+    float x_right = atof(argv[3]);
+    float y_top = atof(argv[4]);
+    float par_alpha = atof(argv[5]);
+    float par_beta = atof(argv[6]);
+    float par_k = atof(argv[7]);
+    float par_b = atof(argv[8]);
+    float par_omega = atof(argv[9]);
+    float hh = atof(argv[10]);
     bool isStart = atof(argv[11]);
 
     Area wa(x_left, y_top, x_right, y_down);
@@ -182,11 +182,11 @@ int main(int argc, char** argv){
         vector<int> vozvrat_set(n_x*n_y);
         iota(begin(vozvrat_set), end(vozvrat_set), 1);
         vector<int> vozvrat = theLoop(wa, hh, 0, 0, vozvrat_set);
-        ofstream cells_file((char*)"cells_file", ios::trunc);
-        ofstream points_file((char*)"points_file", ios::trunc);
+        ofstream cells_file((char*)"cells_file.osip", ios::trunc);
+        ofstream points_file((char*)"points_file.osip", ios::trunc);
         for (auto elem : vozvrat){
             cells_file << elem + 1 << endl;
-            pair<double,double> corner = wa.cell_coord(elem + 1, hh);
+            pair<float,float> corner = wa.cell_coord(elem + 1, hh);
             points_file << corner.first << endl << corner.second << endl;
         }
         cells_file.close();
@@ -194,18 +194,18 @@ int main(int argc, char** argv){
     }
     else{
         vector<int> vozvrat_set;
-        vector<int> new_vozvr = vozvratFromFile((char*)"cells_file");
+        vector<int> new_vozvr = vozvratFromFile((char*)"cells_file.osip");
         for (int elem : new_vozvr){
             vector<int> temp = cell_dribling(elem, n_x);
             vozvrat_set.insert(vozvrat_set.end(), temp.begin(), temp.end());
         }
         hh = hh/2;
         vector<int> vozvrat = theLoop(wa, hh, 0, 0, vozvrat_set);
-        ofstream cells_file((char*)"cells_file", ios::trunc);
-        ofstream points_file((char*)"points_file", ios::trunc);
+        ofstream cells_file((char*)"cells_file.osip", ios::trunc);
+        ofstream points_file((char*)"points_file.osip", ios::trunc);
         for (auto elem : vozvrat){
             cells_file << elem << endl;
-            pair<double,double> corner = wa.cell_coord(elem, hh);
+            pair<float,float> corner = wa.cell_coord(elem, hh);
             points_file << corner.first << endl << corner.second << endl;
         }
         cells_file.close();

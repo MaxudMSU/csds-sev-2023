@@ -19,19 +19,19 @@ def iterate():
     par_list = ' '.join(list(map(lambda x: x.get(), entery_list[2:])))
     # print(par_list)
     start = time.time()
-    os.system('g++ another2.cpp')
+    os.system('g++ entropy.cpp')
     os.system('./a.out ' + par_list + ' ' + str(itercount))
     end = time.time()
     iter_time = end - start
     entire_time += iter_time
-    with open('file') as file:
+    with open('file.osip') as file:
         points = file.read()
         splitPoints = points.split()
         floatPoints = list(map(float, splitPoints))
         xs = floatPoints[0::2]
         ys = floatPoints[1::2]
 
-    with open('res') as res:
+    with open('res.osip') as res:
         res_raw = res.read()
         # split_res = res_raw.split()
     # исправить

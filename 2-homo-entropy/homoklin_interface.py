@@ -19,12 +19,12 @@ def iterate():
     par_list = ' '.join(['0','0'] + list(map(lambda x: x.get(), entery_list[2:])))
     # print(par_list)
     start = time.time()
-    os.system('g++ another1.cpp /usr/lib/libXbgi.a -lX11 -lm')
+    os.system('g++ homoklin.cpp /usr/lib/libXbgi.a -lX11 -lm')
     os.system('./a.out ' + par_list + ' ' + str(itercount))
     end = time.time()
     iter_time = end - start
     entire_time += iter_time
-    with open('fil1') as file1:
+    with open('fil1.osip') as file1:
         points1 = file1.read()
         splitPoints1 = points1.split()
         homoclinic = splitPoints1[-2] + ', ' + splitPoints1[-1]
@@ -32,14 +32,14 @@ def iterate():
         xs1 = floatPoints1[0::2]
         ys1 = floatPoints1[1::2]
     
-    with open('fil2') as file2:
+    with open('fil2.osip') as file2:
         points2 = file2.read()
         splitPoints2 = points2.split()
         floatPoints2 = list(map(float, splitPoints2))
         xs2 = floatPoints2[0::2]
         ys2 = floatPoints2[1::2]
 
-    # with open('res') as res:
+    # with open('res.osip') as res:
     #     res_raw = res.read()
     #     split_res = res_raw.split()
     final_res = [homoclinic] + [str(iter_time)] + [str(entire_time)]

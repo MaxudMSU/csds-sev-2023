@@ -160,8 +160,8 @@ int main(int argc, char** argv){
     // time_t start = time(NULL);
     
     else{
-        newgv1 = pointsFromFile("fil1");
-        newgv2 = pointsFromFile("fil2");
+        newgv1 = pointsFromFile("fil1.osip");
+        newgv2 = pointsFromFile("fil2.osip");
         homoklin = newgv1.back();
         vector<Point> newnewgv1 = gen(newgv1[0], newgv1[1], accuracy);
         vector<Point> newnewgv2 = revGen(newgv2[0], newgv2[1], accuracy);
@@ -187,9 +187,9 @@ int main(int argc, char** argv){
     double N1 = newgv1.size(), N2 = newgv2.size();
     double entropy1 = log(N1)/itercount, entropy2 = log(N2)/itercount;
     ofstream fileeeeee, fil, res;
-    fileeeeee.open("fil1", ios::trunc);
-    fil.open("fil2", ios::trunc);
-    res.open("res", ios::trunc);
+    fileeeeee.open("fil1.osip", ios::trunc);
+    fil.open("fil2.osip", ios::trunc);
+    res.open("res.osip", ios::trunc);
     res << fmax(entropy1, entropy2) << " " << anglee;
     
     // запись в файл

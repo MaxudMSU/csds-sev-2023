@@ -1,104 +1,113 @@
-from matplotlib import pyplot as plt
+import os
+import time
+import numpy as np
+
 from matplotlib.figure import Figure
+from matplotlib import colormaps
+from matplotlib.colors import Normalize
 from tkinter import *
 from tkinter import ttk
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
-import os
-import time
 
-def help(str):
-    if str:
-        a, b = str.split(', ')
-        return [eval(a), eval(b)]
-
-def true_start():
-    global par_list
-    global h
-    global isStart
-    global iter_num
-    global times
-    isStart = 1
-    clear_res()
-    h = float(h_entry.get())
-    par_list = ' '.join(list(map(lambda x: x.get(), entery_list[2:])))
-    iter_num = 0
-    times = 0
-    os.system('g++ crs-duffing.cpp')
-    proga_work()
-
-def proga_work():
-    global par_list
-    global h
-    global times
-    global isStart
-    global iter_num
-    start = time.time()
-    current_par_list = par_list + ' ' + str(h) + ' ' + str(isStart)
-    os.system('./a.out ' + current_par_list)
-    timee = time.time() - start
-    times += timee
-    iter_num += 1
-    res5_value.config(text=str(iter_num))
-    res3_value.config(text=str(timee))
-    res4_value.config(text=str(times))
-    if not isStart: h = h/2
-    res6_value.config(text=str(h))
-    isStart = 0
-
-def iter():
-    num_iter = spinbox.get()
-    for i in range(0,int(num_iter)):
-        proga_work()
-
-def draw_result():
-    global h
-    file = open('points_file', 'r')
-    raw = file.read()
-    file.close()
-    splt = raw.split()
-    splt1 = list(map(eval, splt))
-    res1_value.config(text=str(len(splt1)/2))
-    ax.clear()
-    for i in range(1, len(splt1),2):
-        rectangle = plt.Rectangle((splt1[i-1], splt1[i]), h, h, fc='black',ec="black")
-        ax.add_patch(rectangle)
-    ax.set_xlim([-2, 2])
-    ax.set_ylim([-2, 2])
-    ax.grid()
-    canvas.draw()
+def clear_all():
+    for i in entery_list:
+        i.delete(0, 'end')
 
 def fill_map():
     clear_all()
-    x_entry.insert(0, 'y')
-    y_entry.insert(0, '-a*x-b*x**3-k*y+B*cos(omega*t)')
-    paralpha_entry.insert(0, '-0.8')
-    parbeta_entry.insert(0, '1')
-    park_entry.insert(0, '0.25')
-    parb_entry.insert(0, '0.3')
-    paromega_entry.insert(0, '1')
+    x_entry.insert(0, 'x**2 - y**2 + a')
+    y_entry.insert(0, '2*x*y+b')
+    paralpha_entry.insert(0, '0.2')
+    parbeta_entry.insert(0, '-0.2')
     x1_entry.insert(0,'-2')
     y1_entry.insert(0, '-2')
     x2_entry.insert(0, '2')
     y2_entry.insert(0, '2')
     h_entry.insert(0, '0.5')
 
-def clear_all():
-    for i in entery_list:
-        i.delete(0, 'end')
+def iterate_from_start():   
+    # iternum = int(globiterc1.text())
+    iternum = int(iter_entry.get())
+    # res_neout1 = ""
+    os.system('g++ main.cpp')
+    mainiteration()
+    
+def mainiteration():
+    global start
+    x0 = eval(x1_entry.get()) #s1[0]
+    y0 = eval(y1_entry.get()) #s1[1]
+    x1 = eval(x2_entry.get()) #s2[0]
+    y1 = eval(y2_entry.get()) #s2[1]
+    somelist1 = [x0,y0]
+    somelist2 = [x1,y1]
+    # somelist1, somelist2 = (txtobl.text()).split("x")
+    # somelist1 = eval(str(somelist1))
+    # somelist2 = eval(str(somelist2))
+    x0 = somelist1[0]
+    y0 = somelist2[1]
+    L = somelist2[0] - somelist1[0]
+    H = somelist2[1] - somelist1[1]
+    print(x0,y0,L,H)
+    # somelist1, somelist2 = (listparam.text()).split(",")
+    # a = str(somelist1).split("=")[1]
+    # b = str(somelist2).split("=")[1]
+    a = paralpha_entry.get()
+    b = parbeta_entry.get()
+    print(a,b)
+    # iterations = globiterc1.text()
+    iterations = int(iter_entry.get())
+    #if iternum == int(globiterc1.text()):
+        #res_neout1 = f"{matr}\nСобственные значения: {eig(matr)[0][0]} {eig(matr)[0][1]} {eig(matr)[0][2]}\n"
+    start = time.time()
+    os.system(f"./a.out {x0} {y0} {L} {H} {a} {b} {iterations}") # {a32} {a33} {iternum}")  
+    #os.system(f".\main.exe {a11} {a12} {a13} {a21} {a22} {a23} {a31} {a32} {a33} {iternum}")    
+    
+def mymainpainter():
+    global start
+    ax.clear() 
+    with open('res.osip') as f:
+        lines = f.readlines()
 
-def block_res():
-    [x.config(state='readonly') for x in res_entries]
+    # print(lines[-1])
+    # print(lines[-2].split()[1])
+    res1_value.config(text=str(lines[-2].split()[1]))
+    toprintcomsnum = lines[-1].rstrip()
+    toprintcellamount = lines[-2].split(" ")[1]
+    #res_neout1 = f"{res_neout1}Время подсчета { iternum } итераций: {restime}\nРазмер ячейки: {d}\n"
+    lines = lines[:-2]
+    
+    x=[]
+    y=[]
+    vals=[]
+    d=float(lines[0])
+    res6_value.config(text=str(d))
+    for i in range(1,len(lines)):
+        x_t1, y_t1, val = lines[i].split()
+        x.append(float(x_t1))
+        y.append(float(y_t1))
+        vals.append(float(val))
 
-def clear_res():
-    for i in res_entries:
-        i.config(text='')
+    cmap = colormaps['magma']
+    norm = Normalize(vmin=min(vals), vmax=max(vals))
+    colors = cmap(norm(vals))
 
-def fill_res(values):
-    for i in range(len(values)):
-        res_entries[i].insert(0, values[i])
+    ax.bar3d(x, y, np.zeros_like(x), d, d, vals, shade=True, color=colors)
+    canvas.draw()
+    #plt.show()
+    try:
+        restime = time.time() - start
+    except AttributeError:
+        restime = 0
+        iternum = 0
+    # print(restime)
+    res4_value.config(text=str(restime))
+    # res_neout1 = f"{res_neout1}Время подсчета { iternum } итераций: {restime}\nРазмер ячейки: {d}\n"
+    # res_neout1 = f"{res_neout1}Количество ячеек { toprintcellamount }\n Компонент сильной связности: {toprintcomsnum}\n"
+    # res_out1.setText(res_neout1)
+
 
 window = Tk()
-window.title('Цепно-реккурентное множество')
+window.title('Метод балансировки')
 
 notebook = ttk.Notebook()
 notebook.pack(expand=True, fill=BOTH)
@@ -116,10 +125,10 @@ frame111.pack(side=LEFT, expand=True, fill=BOTH, padx=10, pady=10)
 frame111_left = Frame(frame111)
 frame111_left.pack(side=LEFT, expand=True, fill=BOTH, padx=10, pady=10)
 
-x_label = Label(frame111_left, text='dx/dt = ', anchor='e')
+x_label = Label(frame111_left, text='f(x) = ', anchor='e')
 x_label.pack(expand=True, fill=BOTH)
 
-y_label = Label(frame111_left, text='dy/dt = ', anchor='e')
+y_label = Label(frame111_left, text='f(y) = ', anchor='e')
 y_label.pack(expand=True, fill=BOTH)
 
 frame111_right = Frame(frame111)
@@ -138,23 +147,17 @@ frame112.pack(side=LEFT, expand=True, fill=BOTH, padx=10, pady=10)
 frame112_left = Frame(frame112)
 frame112_left.pack(side=LEFT, expand=True, fill=BOTH)
 
-paralpha_label = Label(frame112_left, text='alpha = ', anchor='e')
+paralpha_label = Label(frame112_left, text='a = ', anchor='e')
 paralpha_label.pack(expand=True, fill=BOTH)
 
-parbeta_label = Label(frame112_left, text='beta = ', anchor='e')
+parbeta_label = Label(frame112_left, text='b = ', anchor='e')
 parbeta_label.pack(expand=True, fill=BOTH)
-
-park_label = Label(frame112_left, text='k = ', anchor='e')
-park_label.pack(expand=True, fill=BOTH)
-
-parb_label = Label(frame112_left, text='B = ', anchor='e')
-parb_label.pack(expand=True, fill=BOTH)
-
-paromega_label = Label(frame112_left, text='omega = ', anchor='e')
-paromega_label.pack(expand=True, fill=BOTH)
 
 h_label = Label(frame112_left, text='Начальный размер ячейки: ', anchor='e')
 h_label.pack(expand=True, fill=BOTH)
+
+iter_label = Label(frame112_left, text='Кол-во итераций: ', anchor='e')
+iter_label.pack(expand=True, fill=BOTH)
 
 frame112_right = Frame(frame112)
 frame112_right.pack(side=LEFT, expand=True, fill=BOTH)
@@ -165,17 +168,11 @@ paralpha_entry.pack(expand=True, fill=X)
 parbeta_entry = Entry(frame112_right)
 parbeta_entry.pack(expand=True, fill=X)
 
-park_entry = Entry(frame112_right)
-park_entry.pack(expand=True, fill=X)
-
-parb_entry = Entry(frame112_right)
-parb_entry.pack(expand=True, fill=X)
-
-paromega_entry = Entry(frame112_right)
-paromega_entry.pack(expand=True, fill=X)
-
 h_entry = Entry(frame112_right)
 h_entry.pack(expand=True, fill=X)
+
+iter_entry = Entry(frame112_right)
+iter_entry.pack(expand=True, fill=X)
 
 points_label = Label(frame1, text="Координаты начальной области")
 points_label.pack(fill=BOTH)
@@ -238,14 +235,8 @@ frame21.pack(expand=True, fill=BOTH)
 frame211 = Frame(frame21)
 frame211.pack(side=LEFT, expand=True, fill=BOTH)
 
-res1_label = Label(frame211, text="Количество ячеек: ", font=("Arial", 14), anchor='e')
+res1_label = Label(frame211, text="Количество ячеек в области: ", font=("Arial", 14), anchor='e')
 res1_label.pack(expand=True, fill=BOTH)
-
-res5_label = Label(frame211, text="Количество итераций:  ", font=("Arial", 14), anchor='e')
-res5_label.pack(expand=True, fill=BOTH)
-
-res3_label = Label(frame211, text="Время работы итерации: ", font=("Arial", 14), anchor='e')
-res3_label.pack(expand=True, fill=BOTH)
 
 res4_label = Label(frame211, text="Общее ремя работы: ", font=("Arial", 14), anchor='e')
 res4_label.pack(expand=True, fill=BOTH)
@@ -263,39 +254,33 @@ frame212.pack(side=LEFT, expand=True, fill=BOTH)
 res1_value = Label(frame212, text='', anchor='w', font=("Arial", 14))
 res1_value.pack(expand=True, fill=BOTH)
 
-res5_value = Label(frame212, text='', anchor='w', font=("Arial", 14))
-res5_value.pack(expand=True, fill=BOTH)
-
-res3_value = Label(frame212, text='', anchor='w', font=("Arial", 14))
-res3_value.pack(expand=True, fill=BOTH)
-
 res4_value = Label(frame212, text='', anchor='w', font=("Arial", 14))
 res4_value.pack(expand=True, fill=BOTH)
 
 res6_value = Label(frame212, text='', anchor='w', font=("Arial", 14))
 res6_value.pack(expand=True, fill=BOTH)
 
-iter_frame = Frame(frame2)
-iter_frame.pack(expand=True, fill=BOTH)
+# iter_frame = Frame(frame2)
+# iter_frame.pack(expand=True, fill=BOTH)
 
-iter_label = Label(iter_frame, text='Сколько итераций делать за один раз: ', font=("Arial", 14), anchor='e')
-iter_label.pack(side=LEFT, expand=True, fill=BOTH)
+# iter_label = Label(iter_frame, text='Сколько итераций делать за один раз: ', font=("Arial", 14), anchor='e')
+# iter_label.pack(side=LEFT, expand=True, fill=BOTH)
 
-spinbox_var = StringVar(value=1)
-spinbox = ttk.Spinbox(iter_frame, from_=1.0, to=5.0, textvariable=spinbox_var)
-spinbox.pack(side=LEFT, expand=True, fill=X)
+# spinbox_var = StringVar(value=1)
+# spinbox = ttk.Spinbox(iter_frame, from_=1.0, to=5.0, textvariable=spinbox_var)
+# spinbox.pack(side=LEFT, expand=True, fill=X)
 
-start_btn = Button(frame2, text='Выполнить первую итерацию', command=true_start)
+start_btn = Button(frame2, text='Выполнить', command=iterate_from_start)
 start_btn.pack(pady=10)
 
-iter_btn = Button(frame2, text='Итерировать', command=iter)
+iter_btn = Button(frame2, text='Нарисовать', command=mymainpainter)
 iter_btn.pack(pady=10)
 
-draw_btn = Button(frame2, text="Показать результат", command=draw_result)
-draw_btn.pack(pady=10)
+# draw_btn = Button(frame2, text="Показать результат")
+# draw_btn.pack(pady=10)
 
 fig = Figure()
-ax = fig.add_subplot(111)
+ax = fig.add_subplot(111, projection='3d')
 canvas = FigureCanvasTkAgg(fig, master = frame2)
 canvas.draw()
 toolbar = NavigationToolbar2Tk(canvas, frame2, pack_toolbar=False)
@@ -303,9 +288,9 @@ toolbar.update()
 canvas.get_tk_widget().pack(expand=True, fill=BOTH)
 toolbar.pack(expand=True, fill=X)
 
-entery_list = [x_entry,y_entry,x1_entry, y1_entry, x2_entry, y2_entry, paralpha_entry, parbeta_entry, park_entry, parb_entry, paromega_entry]
-res_entries = [res1_value, res5_value, res3_value, res4_value, res6_value]
+par_list = [paralpha_entry, parbeta_entry]
+entery_list = [x_entry,y_entry,x1_entry, y1_entry, x2_entry, y2_entry] + par_list
+res_entries = [res1_value, res4_value, res6_value]
 
 fill_map()
-
 window.mainloop()
